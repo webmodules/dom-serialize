@@ -37,4 +37,41 @@ describe('node-serialize', function () {
     assert.equal('<div foo="bar" escape="&#60;&#62;&#38;&#34;&#39;"></div>', serialize(node));
   });
 
+  it('should emit a "serialize" event on a DIV node', function () {
+    var node = document.createElement('div');
+    var count = 0;
+    node.addEventListener('serialize', function (e) {
+      count++;
+      e.detail.serialize = 'MEOW';
+    });
+    assert.equal(0, count);
+    assert.equal('MEOW', serialize(node));
+    assert.equal(1, count);
+  });
+
+  it('should emit a "serialize" event on a Text node', function () {
+    var node = document.createTextNode('whaaaaa!!!!!!');
+    var count = 0;
+    node.addEventListener('serialize', function (e) {
+      count++;
+      e.detail.serialize = 'MEOW';
+    });
+    assert.equal(0, count);
+    assert.equal('MEOW', serialize(node));
+    assert.equal(1, count);
+  });
+
+  it('should output an empty string when "serialize" event is cancelled', function () {
+    var node = document.createElement('div');
+    node.appendChild(document.createTextNode('!'));
+    var count = 0;
+    node.firstChild.addEventListener('serialize', function (e) {
+      count++;
+      e.preventDefault();
+    });
+    assert.equal(0, count);
+    assert.equal('<div></div>', serialize(node));
+    assert.equal(1, count);
+  });
+
 });
