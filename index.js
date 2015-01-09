@@ -44,10 +44,8 @@ function serialize (node) {
   switch (node.nodeType) {
     case 1 /* element */:
       return exports.serializeElement(node);
-      break;
     case 3 /* text */:
       return exports.serializeText(node);
-      break;
   }
   return '';
 }
