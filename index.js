@@ -38,7 +38,21 @@ function serialize (node) {
 
   var cancelled = !node.dispatchEvent(e);
   if (cancelled) return '';
-  if (e.detail.serialize != null) return e.detail.serialize;
+
+  // `e.data.serialize` can be set to a:
+  //   String - returned directly
+  //   Node   - goes through serializer logic instead of `node`
+  //   Anything else - get Stringified first, and then returned directly
+  if (e.detail.serialize != null) {
+    if ('string' === typeof e.data.serialize.nodeType) {
+      return e.detail.serialize;
+    } else if ('number' === typeof e.data.serialize.nodeType) {
+      // make it go through the serialization logic below
+      node = e.detail.serialize;
+    } else {
+      return String(e.detail.serialize);
+    }
+  }
 
   // default serialization logic
   switch (node.nodeType) {
