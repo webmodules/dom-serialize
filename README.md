@@ -6,8 +6,6 @@ dom-serialize
 
 [![Build Status](https://travis-ci.org/webmodules/dom-serialize.svg?branch=master)](https://travis-ci.org/webmodules/dom-serialize)
 
-https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent.CustomEvent
-
 Works with Text nodes, DOM elements, etc.
 
 Dispatches a custom "serialize" event on every `Node` which event listeners
