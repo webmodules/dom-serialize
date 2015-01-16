@@ -25,7 +25,7 @@
   "homepage": "https://github.com/webmodules/dom-serialize",
   "dependencies": {
     "custom-event": "~1.0.0",
-    "ent": "~2.1.1",
+    "ent": "~2.2.0",
     "void-elements": "~1.0.0"
   },
   "devDependencies": {
