@@ -3,7 +3,7 @@
  * Module dependencies.
  */
 
-var ent = require('ent');
+var encode = require('ent/encode');
 var CustomEvent = require('custom-event');
 var voidElements = require('void-elements').reduce(function (obj, name) {
   obj[name] = true;
@@ -15,7 +15,7 @@ var voidElements = require('void-elements').reduce(function (obj, name) {
  */
 
 exports = module.exports = serialize;
-exports.escapeHTML = ent.encode;
+exports.escapeHTML = encode;
 exports.serializeElement = serializeElement;
 exports.serializeText = serializeText;
 

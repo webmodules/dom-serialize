@@ -25,7 +25,7 @@
   "homepage": "https://github.com/webmodules/node-serialize",
   "dependencies": {
     "custom-event": "~1.0.0",
-    "ent": "~2.0.0",
+    "ent": "~2.1.1",
     "void-elements": "~1.0.0"
   },
   "devDependencies": {
