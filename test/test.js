@@ -76,6 +76,14 @@ describe('node-serialize', function () {
     assert.equal('<b></b><i>foo</i>', serialize(node));
   });
 
+  it('should serialize an Array of nodes', function () {
+    var array = [];
+    array.push(document.createTextNode('foo'));
+    array.push(document.createElement('div'));
+    array[1].appendChild(document.createTextNode('bar'));
+    assert.equal('foo<div>bar</div>', serialize(array));
+  });
+
   it('should emit a "serialize" event on a DIV node', function () {
     var node = document.createElement('div');
     var count = 0;
