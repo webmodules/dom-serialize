@@ -74,4 +74,28 @@ describe('node-serialize', function () {
     assert.equal(1, count);
   });
 
+  it('should render a Number when set as `e.detail.serialize`', function () {
+    var node = document.createTextNode('whaaaaa!!!!!!');
+    var count = 0;
+    node.addEventListener('serialize', function (e) {
+      count++;
+      e.detail.serialize = 123;
+    });
+    assert.equal(0, count);
+    assert.equal('123', serialize(node));
+    assert.equal(1, count);
+  });
+
+  it('should render a Node when set as `e.detail.serialize`', function () {
+    var node = document.createTextNode('whaaaaa!!!!!!');
+    var count = 0;
+    node.addEventListener('serialize', function (e) {
+      count++;
+      e.detail.serialize = document.createTextNode('foo');
+    });
+    assert.equal(0, count);
+    assert.equal('foo', serialize(node));
+    assert.equal(1, count);
+  });
+
 });
