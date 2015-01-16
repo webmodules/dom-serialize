@@ -73,26 +73,26 @@ function serializeElement (node) {
   var name = node.nodeName.toLowerCase();
 
   // opening tag
-  var r = [ '<' + name ];
+  var r = '<' + name;
 
   // attributes
   for (i = 0, c = node.attributes, l = c.length; i < l; i++) {
-    r.push(' ' + c[i].name + '="' + exports.escapeHTML(c[i].value) + '"');
+    r += ' ' + c[i].name + '="' + exports.escapeHTML(c[i].value) + '"';
   }
 
-  r.push('>');
+  r += '>';
 
   // child nodes
   for (i = 0, c = node.childNodes, l = c.length; i < l; i++) {
-    r.push(serialize(c[i]));
+    r += serialize(c[i]);
   }
 
   // closing tag, only for non-void elements
   if (!voidElements[name]) {
-    r.push('</' + name + '>');
+    r += '</' + name + '>';
   }
 
-  return r.join('');
+  return r;
 }
 
 /**
