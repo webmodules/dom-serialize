@@ -55,7 +55,7 @@ describe('node-serialize', function () {
   });
 
   it('should serialize a Document node', function () {
-    var node = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html');
+    var node = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', null);
     assert.equal('<html></html>', serialize(node));
   });
 
