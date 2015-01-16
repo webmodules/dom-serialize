@@ -44,7 +44,7 @@ function serialize (node) {
   //   Node   - goes through serializer logic instead of `node`
   //   Anything else - get Stringified first, and then returned directly
   if (e.detail.serialize != null) {
-    if ('string' === typeof e.detail.serialize.nodeType) {
+    if ('string' === typeof e.detail.serialize) {
       return e.detail.serialize;
     } else if ('number' === typeof e.detail.serialize.nodeType) {
       // make it go through the serialization logic below
