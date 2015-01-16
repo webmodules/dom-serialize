@@ -19,6 +19,11 @@ describe('node-serialize', function () {
     assert.equal('test', serialize(node));
   });
 
+  it('should serialize a text node with special HTML characters', function () {
+    var node = document.createTextNode('<>\'"&');
+    assert.equal('&lt;&gt;\'"&amp;', serialize(node));
+  });
+
   it('should serialize a DIV element with child nodes', function () {
     var node = document.createElement('div');
     node.appendChild(document.createTextNode('hello '));
@@ -34,7 +39,41 @@ describe('node-serialize', function () {
     var node = document.createElement('div');
     node.setAttribute('foo', 'bar');
     node.setAttribute('escape', '<>&"\'');
-    assert.equal('<div foo="bar" escape="&#60;&#62;&#38;&#34;&#39;"></div>', serialize(node));
+    assert.equal('<div foo="bar" escape="&lt;&gt;&amp;&quot;&apos;"></div>', serialize(node));
+  });
+
+  it('should serialize an Attribute node', function () {
+    var div = document.createElement('div');
+    div.setAttribute('foo', 'bar');
+    var node = div.attributes[0];
+    assert.equal('foo="bar"', serialize(node));
+  });
+
+  it('should serialize a Comment node', function () {
+    var node = document.createComment('test');
+    assert.equal('<!--test-->', serialize(node));
+  });
+
+  it('should serialize a Document node', function () {
+    var node = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html');
+    assert.equal('<html></html>', serialize(node));
+  });
+
+  it('should serialize a Doctype node', function () {
+    var node = document.implementation.createDocumentType(
+      'html',
+      '-//W3C//DTD XHTML 1.0 Strict//EN',
+      'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'
+    );
+    assert.equal('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">', serialize(node));
+  });
+
+  it('should serialize a DocumentFragment node', function () {
+    var node = document.createDocumentFragment();
+    node.appendChild(document.createElement('b'));
+    node.appendChild(document.createElement('i'));
+    node.lastChild.appendChild(document.createTextNode('foo'));
+    assert.equal('<b></b><i>foo</i>', serialize(node));
   });
 
   it('should emit a "serialize" event on a DIV node', function () {

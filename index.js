@@ -15,9 +15,14 @@ var voidElements = require('void-elements').reduce(function (obj, name) {
  */
 
 exports = module.exports = serialize;
-exports.escapeHTML = encode;
 exports.serializeElement = serializeElement;
+exports.serializeAttribute = serializeAttribute;
 exports.serializeText = serializeText;
+exports.serializeComment = serializeComment;
+exports.serializeDocument = serializeDocument;
+exports.serializeDoctype = serializeDoctype;
+exports.serializeDocumentFragment = serializeDocumentFragment;
+exports.serializeNodeList = serializeNodeList;
 
 /**
  * Serializes any DOM node. Returns a string.
@@ -28,8 +33,16 @@ exports.serializeText = serializeText;
  */
 
 function serialize (node) {
-  // first emit a custom "serialize" event on `node`, in case
-  // there are event listeners for custom serialization of this node
+  if (!node) return '';
+  var nodeType = node.nodeType;
+
+  if (!nodeType && 'number' === typeof node.length) {
+    // assume it's a NodeList or Array of Nodes
+    return exports.serializeNodeList(node);
+  }
+
+  // emit a custom "serialize" event on `node`, in case there
+  // are event listeners for custom serialization of this node
   var e = new CustomEvent('serialize', {
     bubbles: true,
     cancelable: true,
@@ -55,13 +68,34 @@ function serialize (node) {
   }
 
   // default serialization logic
-  switch (node.nodeType) {
+  switch (nodeType) {
     case 1 /* element */:
       return exports.serializeElement(node);
+    case 2 /* attribute */:
+      return exports.serializeAttribute(node);
     case 3 /* text */:
       return exports.serializeText(node);
+    case 8 /* comment */:
+      return exports.serializeComment(node);
+    case 9 /* document */:
+      return exports.serializeDocument(node);
+    case 10 /* doctype */:
+      return exports.serializeDoctype(node);
+    case 11 /* document fragment */:
+      return exports.serializeDocumentFragment(node);
   }
+
   return '';
+}
+
+/**
+ * Serialize an Attribute node.
+ */
+
+function serializeAttribute (node) {
+  return node.name + '="' + encode(node.value, {
+    named: true
+  }) + '"';
 }
 
 /**
@@ -77,15 +111,13 @@ function serializeElement (node) {
 
   // attributes
   for (i = 0, c = node.attributes, l = c.length; i < l; i++) {
-    r += ' ' + c[i].name + '="' + exports.escapeHTML(c[i].value) + '"';
+    r += ' ' + exports.serializeAttribute(c[i]);
   }
 
   r += '>';
 
   // child nodes
-  for (i = 0, c = node.childNodes, l = c.length; i < l; i++) {
-    r += serialize(c[i]);
-  }
+  r += exports.serializeNodeList(node.childNodes);
 
   // closing tag, only for non-void elements
   if (!voidElements[name]) {
@@ -100,5 +132,58 @@ function serializeElement (node) {
  */
 
 function serializeText (node) {
-  return node.nodeValue;
+  return encode(node.nodeValue, {
+    named: true,
+    special: { '<': true, '>': true, '&': true }
+  });
+}
+
+/**
+ * Serialize a comment node.
+ */
+
+function serializeComment (node) {
+  return '<!--' + node.nodeValue + '-->';
+}
+
+/**
+ * Serialize a Document node.
+ */
+
+function serializeDocument (node) {
+  return exports.serializeNodeList(node.childNodes);
+}
+
+/**
+ * Serialize a DOCTYPE node.
+ * See: http://stackoverflow.com/a/10162353
+ */
+
+function serializeDoctype (node) {
+  return '<!DOCTYPE '
+    + node.name
+    + (node.publicId ? ' PUBLIC "' + node.publicId + '"' : '')
+    + (!node.publicId && node.systemId ? ' SYSTEM' : '')
+    + (node.systemId ? ' "' + node.systemId + '"' : '')
+    + '>';
+}
+
+/**
+ * Serialize a DocumentFragment instance.
+ */
+
+function serializeDocumentFragment (node) {
+  return exports.serializeNodeList(node.childNodes);
+}
+
+/**
+ * Serialize a NodeList/Array of nodes.
+ */
+
+function serializeNodeList (list) {
+  var r = '';
+  for (var i = 0, l = list.length; i < l; i++) {
+    r += serialize(list[i]);
+  }
+  return r;
 }
