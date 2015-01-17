@@ -60,8 +60,8 @@ function serialize (node) {
     if ('string' === typeof e.detail.serialize) {
       return e.detail.serialize;
     } else if ('number' === typeof e.detail.serialize.nodeType) {
-      // make it go through the serialization logic below
-      node = e.detail.serialize;
+      // make it go through the serialization logic
+      return serialize(e.detail.serialize);
     } else {
       return String(e.detail.serialize);
     }
