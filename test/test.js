@@ -65,7 +65,14 @@ describe('node-serialize', function () {
       '-//W3C//DTD XHTML 1.0 Strict//EN',
       'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'
     );
+
+    // Some older browsers require the DOCTYPE to be within a Document,
+    // otherwise the "serialize" custom event is considered "cancelled".
+    // See: https://travis-ci.org/webmodules/dom-serialize/builds/47307749
+    var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'html', node);
+
     assert.equal('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">', serialize(node));
+    assert.equal('<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html></html>', serialize(doc));
   });
 
   it('should serialize a DocumentFragment node', function () {
