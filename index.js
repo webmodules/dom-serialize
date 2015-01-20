@@ -160,12 +160,18 @@ function serializeDocument (node) {
  */
 
 function serializeDoctype (node) {
-  return '<!DOCTYPE '
-    + node.name
-    + (node.publicId ? ' PUBLIC "' + node.publicId + '"' : '')
-    + (!node.publicId && node.systemId ? ' SYSTEM' : '')
-    + (node.systemId ? ' "' + node.systemId + '"' : '')
-    + '>';
+  var r = '<!DOCTYPE ' + node.name;
+  if (node.publicId) {
+    r += ' PUBLIC "' + node.publicId + '"';
+  }
+  if (!node.publicId && node.systemId) {
+    r += ' SYSTEM';
+  }
+  if (node.systemId) {
+    r += ' "' + node.systemId + '"';
+  }
+  r += '>';
+  return r;
 }
 
 /**
