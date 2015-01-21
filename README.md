@@ -55,7 +55,7 @@ console.log(serialize(node));
 ```
 
 ```
-&#60;foo&#62; &#38; &#60;bar&#62;
+foo &amp; &lt;bar&gt;
 <body><strong>hello</strong></body>
 <body>pwn</body>
 ```
