@@ -6,11 +6,20 @@ dom-serialize
 
 [![Build Status](https://travis-ci.org/webmodules/dom-serialize.svg?branch=master)](https://travis-ci.org/webmodules/dom-serialize)
 
-Works with Text nodes, DOM elements, etc.
+It's like `outerHTML`, but it works with:
 
-Dispatches a custom "serialize" event on every `Node` which event listeners
-can override the default behavior on by setting the `event.detail.serialize`
-property to a String or other Node.
+ * DOM elements
+ * Text nodes
+ * Attributes
+ * Comment nodes
+ * Documents
+ * DocumentFragments
+ * Doctypes
+ * NodeLists / Arrays
+
+For custom serialization logic, a "serialize" event is dispatched on
+every `Node` which event listeners can override the default behavior on by
+setting the `event.detail.serialize` property to a String or other Node.
 
 
 Installation
