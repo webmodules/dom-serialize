@@ -27,12 +27,13 @@ exports.serializeNodeList = serializeNodeList;
 /**
  * Serializes any DOM node. Returns a string.
  *
- * @param {Node} node
+ * @param {Node} node - DOM Node to serialize
+ * @param {String} [context] - optional arbitrary "context" string to use (useful for event listeners)
  * return {String}
  * @public
  */
 
-function serialize (node) {
+function serialize (node, context) {
   if (!node) return '';
   var nodeType = node.nodeType;
 
@@ -46,7 +47,7 @@ function serialize (node) {
   var e = new CustomEvent('serialize', {
     bubbles: true,
     cancelable: true,
-    detail: { serialize: null }
+    detail: { serialize: null, context: context }
   });
 
   var cancelled = !node.dispatchEvent(e);

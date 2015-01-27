@@ -152,4 +152,20 @@ describe('node-serialize', function () {
     assert.equal(1, count);
   });
 
+  it('should have `context` set on the "serialize" event', function () {
+    var node = document.createTextNode('');
+    var count = 0;
+    node.addEventListener('serialize', function (e) {
+      count++;
+      e.detail.serialize = e.detail.context;
+    });
+    assert.equal(0, count);
+    assert.equal('foo', serialize(node, 'foo'));
+    assert.equal(1, count);
+    assert.equal('bar', serialize(node, 'bar'));
+    assert.equal(2, count);
+    assert.equal('baz', serialize(node, 'baz'));
+    assert.equal(3, count);
+  });
+
 });
