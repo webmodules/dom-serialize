@@ -38,7 +38,7 @@ var serialize = require('dom-serialize');
 var node;
 
 // works with Text nodes
-node= document.createTextNode('foo & <bar>');
+node = document.createTextNode('foo & <bar>');
 console.log(serialize(node));
 
 
