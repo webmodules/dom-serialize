@@ -1,4 +1,13 @@
 
+1.2.0 / 2015-02-02
+==================
+
+  * add support for one-time "serialize" callback functions
+  * add support for a "context" argument
+  * index: make `serializeDoctype()` more readable
+  * README: fix typo in example output
+  * README: better description
+
 1.1.0 / 2015-01-16
 ==================
 
