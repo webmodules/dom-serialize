@@ -41,21 +41,36 @@ var node;
 node= document.createTextNode('foo & <bar>');
 console.log(serialize(node));
 
+
 // works with DOM elements
 node = document.createElement('body');
 node.appendChild(document.createElement('strong'));
 node.firstChild.appendChild(document.createTextNode('hello'));
 console.log(serialize(node));
 
+
 // custom "serialize" event
 node.firstChild.addEventListener('serialize', function (event) {
   event.detail.serialize = 'pwn';
 }, false);
 console.log(serialize(node));
+
+
+// you can also just pass a function in for a one-time serializer
+console.log(serialize(node, function (event) {
+  if (event.target === node.firstChild) {
+    // for the first child, output an ellipsis to summarize "content"
+    event.detail.serialze = '…';
+  } else if (event.target !== node) {
+    // any other child
+    event.preventDefault();
+  }
+}));
 ```
 
 ```
 foo &amp; &lt;bar&gt;
 <body><strong>hello</strong></body>
 <body>pwn</body>
+<body>…</body>
 ```
