@@ -29,64 +29,92 @@ exports.serializeNodeList = serializeNodeList;
  *
  * @param {Node} node - DOM Node to serialize
  * @param {String} [context] - optional arbitrary "context" string to use (useful for event listeners)
+ * @param {Function} [fn] - optional callback function to use in the "serialize" event for this call
  * return {String}
  * @public
  */
 
-function serialize (node, context) {
+function serialize (node, context, fn) {
   if (!node) return '';
+  if ('function' === typeof context) {
+    fn = context;
+    context = null;
+  }
+  if (!context) context = null;
+
+  if ('function' === typeof fn) {
+    // one-time "serialize" event listener
+    node.addEventListener('serialize', fn, false);
+  }
+
+  var rtn;
   var nodeType = node.nodeType;
 
   if (!nodeType && 'number' === typeof node.length) {
     // assume it's a NodeList or Array of Nodes
-    return exports.serializeNodeList(node);
-  }
+    rtn = exports.serializeNodeList(node, context);
+  } else {
 
-  // emit a custom "serialize" event on `node`, in case there
-  // are event listeners for custom serialization of this node
-  var e = new CustomEvent('serialize', {
-    bubbles: true,
-    cancelable: true,
-    detail: { serialize: null, context: context }
-  });
+    // emit a custom "serialize" event on `node`, in case there
+    // are event listeners for custom serialization of this node
+    var e = new CustomEvent('serialize', {
+      bubbles: true,
+      cancelable: true,
+      detail: {
+        serialize: null,
+        context: context
+      }
+    });
 
-  var cancelled = !node.dispatchEvent(e);
-  if (cancelled) return '';
+    if (node.dispatchEvent(e)) {
 
-  // `e.detail.serialize` can be set to a:
-  //   String - returned directly
-  //   Node   - goes through serializer logic instead of `node`
-  //   Anything else - get Stringified first, and then returned directly
-  if (e.detail.serialize != null) {
-    if ('string' === typeof e.detail.serialize) {
-      return e.detail.serialize;
-    } else if ('number' === typeof e.detail.serialize.nodeType) {
-      // make it go through the serialization logic
-      return serialize(e.detail.serialize);
-    } else {
-      return String(e.detail.serialize);
+      // `e.detail.serialize` can be set to a:
+      //   String - returned directly
+      //   Node   - goes through serializer logic instead of `node`
+      //   Anything else - get Stringified first, and then returned directly
+      if (e.detail.serialize != null) {
+        if ('string' === typeof e.detail.serialize) {
+          rtn = e.detail.serialize;
+        } else if ('number' === typeof e.detail.serialize.nodeType) {
+          // make it go through the serialization logic
+          rtn = serialize(e.detail.serialize, context);
+        } else {
+          rtn = String(e.detail.serialize);
+        }
+      } else {
+        // default serialization logic
+        switch (nodeType) {
+          case 1 /* element */:
+            rtn = exports.serializeElement(node, context);
+            break;
+          case 2 /* attribute */:
+            rtn = exports.serializeAttribute(node);
+            break;
+          case 3 /* text */:
+            rtn = exports.serializeText(node);
+            break;
+          case 8 /* comment */:
+            rtn = exports.serializeComment(node);
+            break;
+          case 9 /* document */:
+            rtn = exports.serializeDocument(node, context);
+            break;
+          case 10 /* doctype */:
+            rtn = exports.serializeDoctype(node);
+            break;
+          case 11 /* document fragment */:
+            rtn = exports.serializeDocumentFragment(node, context);
+            break;
+        }
+      }
     }
   }
 
-  // default serialization logic
-  switch (nodeType) {
-    case 1 /* element */:
-      return exports.serializeElement(node);
-    case 2 /* attribute */:
-      return exports.serializeAttribute(node);
-    case 3 /* text */:
-      return exports.serializeText(node);
-    case 8 /* comment */:
-      return exports.serializeComment(node);
-    case 9 /* document */:
-      return exports.serializeDocument(node);
-    case 10 /* doctype */:
-      return exports.serializeDoctype(node);
-    case 11 /* document fragment */:
-      return exports.serializeDocumentFragment(node);
+  if ('function' === typeof fn) {
+    node.removeEventListener('serialize', fn, false);
   }
 
-  return '';
+  return rtn || '';
 }
 
 /**
@@ -103,7 +131,7 @@ function serializeAttribute (node) {
  * Serialize a DOM element.
  */
 
-function serializeElement (node) {
+function serializeElement (node, context) {
   var c, i, l;
   var name = node.nodeName.toLowerCase();
 
@@ -118,7 +146,7 @@ function serializeElement (node) {
   r += '>';
 
   // child nodes
-  r += exports.serializeNodeList(node.childNodes);
+  r += exports.serializeNodeList(node.childNodes, context);
 
   // closing tag, only for non-void elements
   if (!voidElements[name]) {
@@ -151,8 +179,8 @@ function serializeComment (node) {
  * Serialize a Document node.
  */
 
-function serializeDocument (node) {
-  return exports.serializeNodeList(node.childNodes);
+function serializeDocument (node, context) {
+  return exports.serializeNodeList(node.childNodes, context);
 }
 
 /**
@@ -179,18 +207,18 @@ function serializeDoctype (node) {
  * Serialize a DocumentFragment instance.
  */
 
-function serializeDocumentFragment (node) {
-  return exports.serializeNodeList(node.childNodes);
+function serializeDocumentFragment (node, context) {
+  return exports.serializeNodeList(node.childNodes, context);
 }
 
 /**
  * Serialize a NodeList/Array of nodes.
  */
 
-function serializeNodeList (list) {
+function serializeNodeList (list, context, fn) {
   var r = '';
   for (var i = 0, l = list.length; i < l; i++) {
-    r += serialize(list[i]);
+    r += serialize(list[i], context, fn);
   }
   return r;
 }
