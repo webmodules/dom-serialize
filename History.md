@@ -1,4 +1,10 @@
 
+2.0.0 / 2015-02-03
+==================
+
+  * README: update for `serializeTarget`
+  * index: emit the "serialize" event on the node that we know is in the DOM
+
 1.2.1 / 2015-02-03
 ==================
 
