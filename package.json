@@ -29,6 +29,6 @@
     "void-elements": "~1.0.0"
   },
   "devDependencies": {
-    "zuul": "~1.16.3"
+    "zuul": "1"
   }
 }
