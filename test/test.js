@@ -227,6 +227,27 @@ describe('node-serialize', function () {
       assert.equal(1, count);
     });
 
+    it('should support one-time callback function on NodeLists', function () {
+      node = document.createElement('div');
+      node.appendChild(document.createElement('strong'));
+      node.appendChild(document.createTextNode('foo'));
+      node.appendChild(document.createElement('em'));
+      node.appendChild(document.createTextNode('bar'));
+
+      var count = 0;
+
+      function callback (e) {
+        count++;
+        e.detail.serialize = count;
+      }
+
+      assert.equal(0, count);
+      assert.equal('1234', serialize(node.childNodes, callback));
+      assert.equal(4, count);
+      assert.equal('<strong></strong>foo<em></em>bar', serialize(node.childNodes));
+      assert.equal(4, count);
+    });
+
   });
 
 });

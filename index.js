@@ -42,18 +42,18 @@ function serialize (node, context, fn) {
   }
   if (!context) context = null;
 
-  if ('function' === typeof fn) {
-    // one-time "serialize" event listener
-    node.addEventListener('serialize', fn, false);
-  }
-
   var rtn;
   var nodeType = node.nodeType;
 
   if (!nodeType && 'number' === typeof node.length) {
     // assume it's a NodeList or Array of Nodes
-    rtn = exports.serializeNodeList(node, context);
+    rtn = exports.serializeNodeList(node, context, fn);
   } else {
+
+    if ('function' === typeof fn) {
+      // one-time "serialize" event listener
+      node.addEventListener('serialize', fn, false);
+    }
 
     // emit a custom "serialize" event on `node`, in case there
     // are event listeners for custom serialization of this node
@@ -108,10 +108,10 @@ function serialize (node, context, fn) {
         }
       }
     }
-  }
 
-  if ('function' === typeof fn) {
-    node.removeEventListener('serialize', fn, false);
+    if ('function' === typeof fn) {
+      node.removeEventListener('serialize', fn, false);
+    }
   }
 
   return rtn || '';
