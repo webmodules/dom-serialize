@@ -289,8 +289,6 @@ describe('node-serialize', function () {
 
       function callback (e) {
         count++;
-        console.log(e.serializeTarget);
-
         if (e.serializeTarget.nodeValue === 'foo') {
           var el = document.createElement('p');
           el.appendChild(document.createTextNode('x '));
