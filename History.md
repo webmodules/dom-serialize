@@ -1,4 +1,9 @@
 
+2.0.1 / 2015-02-03
+==================
+
+  * index: support Nodes with children for `e.detail.serialize`
+
 2.0.0 / 2015-02-03
 ==================
 
