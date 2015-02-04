@@ -278,6 +278,34 @@ describe('node-serialize', function () {
       assert.equal(4, count);
     });
 
+    it('should support one-time callback function on complex Nodes set in `e.detail.serialize`', function () {
+      node = document.createElement('div');
+      node.appendChild(document.createTextNode('foo'));
+
+      // `node` must be inside the DOM for the "serialize" event to bubble
+      document.body.appendChild(node);
+
+      var count = 0;
+
+      function callback (e) {
+        count++;
+        console.log(e.serializeTarget);
+
+        if (e.serializeTarget.nodeValue === 'foo') {
+          var el = document.createElement('p');
+          el.appendChild(document.createTextNode('x '));
+          el.appendChild(document.createElement('i'));
+          el.lastChild.appendChild(document.createTextNode('bar'));
+
+          e.detail.serialize = el;
+        }
+      }
+
+      assert.equal(0, count);
+      assert.equal('<div><p>x <i>bar</i></p></div>', serialize(node, callback));
+      assert.equal(6, count);
+    });
+
   });
 
 });

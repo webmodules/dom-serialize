@@ -90,7 +90,7 @@ function serialize (node, context, fn, eventTarget) {
         // default serialization logic
         switch (nodeType) {
           case 1 /* element */:
-            rtn = exports.serializeElement(node, context);
+            rtn = exports.serializeElement(node, context, eventTarget);
             break;
           case 2 /* attribute */:
             rtn = exports.serializeAttribute(node);
@@ -102,13 +102,13 @@ function serialize (node, context, fn, eventTarget) {
             rtn = exports.serializeComment(node);
             break;
           case 9 /* document */:
-            rtn = exports.serializeDocument(node, context);
+            rtn = exports.serializeDocument(node, context, eventTarget);
             break;
           case 10 /* doctype */:
             rtn = exports.serializeDoctype(node);
             break;
           case 11 /* document fragment */:
-            rtn = exports.serializeDocumentFragment(node, context);
+            rtn = exports.serializeDocumentFragment(node, context, eventTarget);
             break;
         }
       }
@@ -136,7 +136,7 @@ function serializeAttribute (node) {
  * Serialize a DOM element.
  */
 
-function serializeElement (node, context) {
+function serializeElement (node, context, eventTarget) {
   var c, i, l;
   var name = node.nodeName.toLowerCase();
 
@@ -151,7 +151,7 @@ function serializeElement (node, context) {
   r += '>';
 
   // child nodes
-  r += exports.serializeNodeList(node.childNodes, context);
+  r += exports.serializeNodeList(node.childNodes, context, null, eventTarget);
 
   // closing tag, only for non-void elements
   if (!voidElements[name]) {
@@ -184,8 +184,8 @@ function serializeComment (node) {
  * Serialize a Document node.
  */
 
-function serializeDocument (node, context) {
-  return exports.serializeNodeList(node.childNodes, context);
+function serializeDocument (node, context, eventTarget) {
+  return exports.serializeNodeList(node.childNodes, context, null, eventTarget);
 }
 
 /**
@@ -212,18 +212,18 @@ function serializeDoctype (node) {
  * Serialize a DocumentFragment instance.
  */
 
-function serializeDocumentFragment (node, context) {
-  return exports.serializeNodeList(node.childNodes, context);
+function serializeDocumentFragment (node, context, eventTarget) {
+  return exports.serializeNodeList(node.childNodes, context, null, eventTarget);
 }
 
 /**
  * Serialize a NodeList/Array of nodes.
  */
 
-function serializeNodeList (list, context, fn) {
+function serializeNodeList (list, context, fn, eventTarget) {
   var r = '';
   for (var i = 0, l = list.length; i < l; i++) {
-    r += serialize(list[i], context, fn);
+    r += serialize(list[i], context, fn, eventTarget);
   }
   return r;
 }
