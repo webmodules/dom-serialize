@@ -21,6 +21,11 @@ For custom serialization logic, a "serialize" event is dispatched on
 every `Node` which event listeners can override the default behavior on by
 setting the `event.detail.serialize` property to a String or other Node.
 
+The "serialize" event bubbles, so it could be a good idea to utilize
+event delegation on a known root node that will be serialized.
+Check the `event.serializeTarget` property to check which `Node` is
+currently being serialized.
+
 
 Installation
 ------------
@@ -58,10 +63,10 @@ console.log(serialize(node));
 
 // you can also just pass a function in for a one-time serializer
 console.log(serialize(node, function (event) {
-  if (event.target === node.firstChild) {
+  if (event.serializeTarget === node.firstChild) {
     // for the first child, output an ellipsis to summarize "content"
     event.detail.serialze = '…';
-  } else if (event.target !== node) {
+  } else if (event.serializeTarget !== node) {
     // any other child
     event.preventDefault();
   }
