@@ -162,11 +162,13 @@ describe('node-serialize', function () {
       var count = 0;
       node.addEventListener('serialize', function (e) {
         count++;
-        e.detail.serialize = document.createTextNode('foo');
+        if (count === 1) {
+          e.detail.serialize = document.createTextNode('foo');
+        }
       });
       assert.equal(0, count);
       assert.equal('foo', serialize(node));
-      assert.equal(1, count);
+      assert.equal(2, count);
     });
 
     it('should have `context` set on the event', function () {
@@ -198,16 +200,16 @@ describe('node-serialize', function () {
       node.addEventListener('serialize', function (e) {
         count++;
         assert.equal('foo', e.detail.context);
-        if (e.target === node)
+        if (e.serializeTarget === node)
           return;
-        else if (e.target === node.firstChild)
-          e.detail.serialize = document.createTextNode('…');
+        else if (e.serializeTarget.nodeValue === 'foo')
+          e.detail.serialize = '…';
         else
           e.preventDefault();
       }, false);
 
       assert.equal(0, count);
-      assert.equal('<div>&mldr;</div>', serialize(node, 'foo'));
+      assert.equal('<div>…</div>', serialize(node, 'foo'));
       assert.equal(4, count);
     });
 
@@ -245,6 +247,34 @@ describe('node-serialize', function () {
       assert.equal('1234', serialize(node.childNodes, callback));
       assert.equal(4, count);
       assert.equal('<strong></strong>foo<em></em>bar', serialize(node.childNodes));
+      assert.equal(4, count);
+    });
+
+    it('should support one-time callback function on Nodes set in `e.detail.serialize`', function () {
+      node = document.createElement('div');
+      node.appendChild(document.createTextNode('foo'));
+
+      // `node` must be inside the DOM for the "serialize" event to bubble
+      document.body.appendChild(node);
+
+      var count = 0;
+
+      function callback (e) {
+        count++;
+
+        if (2 === count) {
+          assert.equal('foo', e.serializeTarget.nodeValue);
+          var text = document.createTextNode('bar');
+          e.detail.serialize = text;
+        } else if (3 === count) {
+          assert.equal('bar', e.serializeTarget.nodeValue);
+          var text = document.createTextNode('baz');
+          e.detail.serialize = text;
+        }
+      }
+
+      assert.equal(0, count);
+      assert.equal('<div>baz</div>', serialize(node, callback));
       assert.equal(4, count);
     });
 

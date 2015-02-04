@@ -30,11 +30,12 @@ exports.serializeNodeList = serializeNodeList;
  * @param {Node} node - DOM Node to serialize
  * @param {String} [context] - optional arbitrary "context" string to use (useful for event listeners)
  * @param {Function} [fn] - optional callback function to use in the "serialize" event for this call
+ * @param {EventTarget} [eventTarget] - optional EventTarget instance to emit the "serialize" event on (defaults to `node`)
  * return {String}
  * @public
  */
 
-function serialize (node, context, fn) {
+function serialize (node, context, fn, eventTarget) {
   if (!node) return '';
   if ('function' === typeof context) {
     fn = context;
@@ -66,20 +67,24 @@ function serialize (node, context, fn) {
       }
     });
 
-    if (node.dispatchEvent(e)) {
+    e.serializeTarget = node;
+
+    var target = eventTarget || node;
+    if (target.dispatchEvent(e)) {
 
       // `e.detail.serialize` can be set to a:
       //   String - returned directly
       //   Node   - goes through serializer logic instead of `node`
       //   Anything else - get Stringified first, and then returned directly
-      if (e.detail.serialize != null) {
-        if ('string' === typeof e.detail.serialize) {
-          rtn = e.detail.serialize;
-        } else if ('number' === typeof e.detail.serialize.nodeType) {
+      var s = e.detail.serialize;
+      if (s != null) {
+        if ('string' === typeof s) {
+          rtn = s;
+        } else if ('number' === typeof s.nodeType) {
           // make it go through the serialization logic
-          rtn = serialize(e.detail.serialize, context);
+          rtn = serialize(s, context, null, target);
         } else {
-          rtn = String(e.detail.serialize);
+          rtn = String(s);
         }
       } else {
         // default serialization logic
