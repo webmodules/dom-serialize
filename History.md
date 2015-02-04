@@ -1,4 +1,11 @@
 
+1.2.1 / 2015-02-03
+==================
+
+  * fix one-time callback functions on NodeLists / Arrays
+  * README: fix weird spacing
+  * README: add "inspect" example to readme
+
 1.2.0 / 2015-02-02
 ==================
 
