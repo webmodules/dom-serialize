@@ -96,13 +96,21 @@ describe('node-serialize', function () {
       '',
       'http://www.w3.org/1999/xhtml'
     );
-
-    // Some older browsers require the DOCTYPE to be within a Document,
-    // otherwise the "serialize" custom event is considered "cancelled".
-    // See: https://travis-ci.org/webmodules/dom-serialize/builds/47307749
-    var doc = document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'root-element', node);
+    document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'root-element', node);
 
     assert.equal('<!DOCTYPE root-element SYSTEM "http://www.w3.org/1999/xhtml">', serialize(node));
+  });
+
+
+  it('should serialize an HTML5 Doctype node', function () {
+    node = document.implementation.createDocumentType(
+      'html',
+      '',
+      ''
+    );
+    document.implementation.createDocument('http://www.w3.org/1999/xhtml', 'node', node);
+
+    assert.equal('<!DOCTYPE html>', serialize(node));
   });
 
   it('should serialize a DocumentFragment node', function () {
