@@ -70,47 +70,46 @@ function serialize (node, context, fn, eventTarget) {
     e.serializeTarget = node;
 
     var target = eventTarget || node;
-    if (target.dispatchEvent(e)) {
+    var cancelled = !target.dispatchEvent(e);
 
-      // `e.detail.serialize` can be set to a:
-      //   String - returned directly
-      //   Node   - goes through serializer logic instead of `node`
-      //   Anything else - get Stringified first, and then returned directly
-      var s = e.detail.serialize;
-      if (s != null) {
-        if ('string' === typeof s) {
-          rtn = s;
-        } else if ('number' === typeof s.nodeType) {
-          // make it go through the serialization logic
-          rtn = serialize(s, context, null, target);
-        } else {
-          rtn = String(s);
-        }
+    // `e.detail.serialize` can be set to a:
+    //   String - returned directly
+    //   Node   - goes through serializer logic instead of `node`
+    //   Anything else - get Stringified first, and then returned directly
+    var s = e.detail.serialize;
+    if (s != null) {
+      if ('string' === typeof s) {
+        rtn = s;
+      } else if ('number' === typeof s.nodeType) {
+        // make it go through the serialization logic
+        rtn = serialize(s, context, null, target);
       } else {
-        // default serialization logic
-        switch (nodeType) {
-          case 1 /* element */:
-            rtn = exports.serializeElement(node, context, eventTarget);
-            break;
-          case 2 /* attribute */:
-            rtn = exports.serializeAttribute(node);
-            break;
-          case 3 /* text */:
-            rtn = exports.serializeText(node);
-            break;
-          case 8 /* comment */:
-            rtn = exports.serializeComment(node);
-            break;
-          case 9 /* document */:
-            rtn = exports.serializeDocument(node, context, eventTarget);
-            break;
-          case 10 /* doctype */:
-            rtn = exports.serializeDoctype(node);
-            break;
-          case 11 /* document fragment */:
-            rtn = exports.serializeDocumentFragment(node, context, eventTarget);
-            break;
-        }
+        rtn = String(s);
+      }
+    } else if (!cancelled) {
+      // default serialization logic
+      switch (nodeType) {
+        case 1 /* element */:
+          rtn = exports.serializeElement(node, context, eventTarget);
+          break;
+        case 2 /* attribute */:
+          rtn = exports.serializeAttribute(node);
+          break;
+        case 3 /* text */:
+          rtn = exports.serializeText(node);
+          break;
+        case 8 /* comment */:
+          rtn = exports.serializeComment(node);
+          break;
+        case 9 /* document */:
+          rtn = exports.serializeDocument(node, context, eventTarget);
+          break;
+        case 10 /* doctype */:
+          rtn = exports.serializeDoctype(node);
+          break;
+        case 11 /* document fragment */:
+          rtn = exports.serializeDocumentFragment(node, context, eventTarget);
+          break;
       }
     }
 

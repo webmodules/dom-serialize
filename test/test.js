@@ -194,6 +194,21 @@ describe('node-serialize', function () {
       assert.equal(2, count);
     });
 
+    it('should render a Node when set as `e.detail.serialize` and event is cancelled', function () {
+      node = document.createTextNode('whaaaaa!!!!!!');
+      var count = 0;
+      node.addEventListener('serialize', function (e) {
+        count++;
+        if (count === 1) {
+          e.preventDefault();
+          e.detail.serialize = document.createTextNode('foo');
+        }
+      });
+      assert.equal(0, count);
+      assert.equal('foo', serialize(node));
+      assert.equal(2, count);
+    });
+
     it('should have `context` set on the event', function () {
       node = document.createTextNode('');
       var count = 0;
