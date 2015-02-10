@@ -1,4 +1,13 @@
 
+2.1.0 / 2015-02-10
+==================
+
+  * if `e.detail.serialize` is set and the event is cancelled, still use the `e.detail.serialize` value
+  * attempting to get 100% test code coverage
+  * package: allow any "zuul" v1
+  * test: add HTML5 Doctype test, for 100% test code coverage!
+  * test: remove `console.log()` call
+
 2.0.1 / 2015-02-03
 ==================
 
