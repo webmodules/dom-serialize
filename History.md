@@ -1,4 +1,9 @@
 
+2.2.0 / 2015-02-13
+==================
+
+  * add support for passing `encode()` options in to `serializeAttribute()` and `serializeTextNode()`
+
 2.1.0 / 2015-02-10
 ==================
 
