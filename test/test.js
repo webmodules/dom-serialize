@@ -129,6 +129,36 @@ describe('node-serialize', function () {
     assert.equal('foo<div>bar</div>', serialize(array));
   });
 
+  describe('serializeText()', function () {
+
+    it('should serialize an Attribute node', function () {
+      var d = document.createElement('div');
+      d.setAttribute('foo', '<>"&');
+      assert.equal('foo="&lt;&gt;&quot;&amp;"', serialize.serializeAttribute(d.attributes[0]));
+    });
+
+    it('should allow an "options" object to be passed in', function () {
+      var d = document.createElement('div');
+      d.setAttribute('foo', '<>"&');
+      assert.equal('foo="&#60;&#62;&#34;&#38;"', serialize.serializeAttribute(d.attributes[0], { named: false }));
+    });
+
+  });
+
+  describe('serializeText()', function () {
+
+    it('should serialize a TextNode instance', function () {
+      node = document.createTextNode('<b>&');
+      assert.equal('&lt;b&gt;&amp;', serialize.serializeText(node));
+    });
+
+    it('should allow an "options" object to be passed in', function () {
+      node = document.createTextNode('<b>&');
+      assert.equal('&#60;b&#62;&#38;', serialize.serializeText(node, { named: false }));
+    });
+
+  });
+
   describe('"serialize" event', function () {
 
     it('should emit a "serialize" event on a DIV node', function () {

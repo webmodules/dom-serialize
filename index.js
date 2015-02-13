@@ -3,6 +3,7 @@
  * Module dependencies.
  */
 
+var extend = require('extend');
 var encode = require('ent/encode');
 var CustomEvent = require('custom-event');
 var voidElements = require('void-elements').reduce(function (obj, name) {
@@ -125,10 +126,10 @@ function serialize (node, context, fn, eventTarget) {
  * Serialize an Attribute node.
  */
 
-function serializeAttribute (node) {
-  return node.name + '="' + encode(node.value, {
+function serializeAttribute (node, opts) {
+  return node.name + '="' + encode(node.value, extend({
     named: true
-  }) + '"';
+  }, opts)) + '"';
 }
 
 /**
@@ -164,11 +165,11 @@ function serializeElement (node, context, eventTarget) {
  * Serialize a text node.
  */
 
-function serializeText (node) {
-  return encode(node.nodeValue, {
+function serializeText (node, opts) {
+  return encode(node.nodeValue, extend({
     named: true,
     special: { '<': true, '>': true, '&': true }
-  });
+  }, opts));
 }
 
 /**
