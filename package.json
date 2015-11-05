@@ -26,8 +26,8 @@
   "dependencies": {
     "custom-event": "~1.0.0",
     "ent": "~2.2.0",
-    "extend": "~2.0.0",
-    "void-elements": "~1.0.0"
+    "extend": "^3.0.0",
+    "void-elements": "^2.0.0"
   },
   "devDependencies": {
     "zuul": "1"
